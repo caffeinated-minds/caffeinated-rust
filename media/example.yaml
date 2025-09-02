@@ -1,0 +1,263 @@
+# Kubernetes deployment configuration for platform services
+# This demonstrates comprehensive YAML syntax highlighting
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: platform-api
+  namespace: production
+  labels:
+    app: platform-api
+    version: "v1.2.3"
+    component: backend
+    team: platform-engineering
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    kubernetes.io/change-cause: "Update to rust-colored theme support"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: platform-api
+  template:
+    metadata:
+      labels:
+        app: platform-api
+        version: "v1.2.3"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: platform-api-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: platform-api
+          image: gcr.io/project-id/platform-api:v1.2.3
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          env:
+            - name: ENVIRONMENT
+              value: "production"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: database-credentials
+                  key: url
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-config
+                  key: connection-string
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: secret-key
+                  optional: false
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+              ephemeral-storage: "1Gi"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+              ephemeral-storage: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+          startupProbe:
+            httpGet:
+              path: /startup
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 2
+            timeoutSeconds: 1
+            failureThreshold: 30
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+              readOnly: true
+            - name: logs-volume
+              mountPath: /var/log/app
+            - name: cache-volume
+              mountPath: /tmp/cache
+        - name: sidecar-proxy
+          image: envoyproxy/envoy:v1.22.0
+          ports:
+            - name: proxy
+              containerPort: 9000
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          volumeMounts:
+            - name: envoy-config
+              mountPath: /etc/envoy
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: platform-api-config
+            items:
+              - key: app.yaml
+                path: application.yaml
+              - key: logging.yaml
+                path: logging.yaml
+        - name: logs-volume
+          emptyDir:
+            sizeLimit: "1Gi"
+        - name: cache-volume
+          emptyDir:
+            medium: Memory
+            sizeLimit: "512Mi"
+        - name: envoy-config
+          secret:
+            secretName: envoy-config
+            defaultMode: 0644
+      nodeSelector:
+        node-type: "worker"
+        zone: "us-west-2a"
+      tolerations:
+        - key: "platform-workload"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: platform-api
+                topologyKey: "kubernetes.io/hostname"
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "node.kubernetes.io/instance-type"
+                    operator: In
+                    values:
+                      - "m5.large"
+                      - "m5.xlarge"
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+
+---
+# Service configuration
+apiVersion: v1
+kind: Service
+metadata:
+  name: platform-api-service
+  namespace: production
+  labels:
+    app: platform-api
+    service: backend
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+spec:
+  type: LoadBalancer
+  selector:
+    app: platform-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+    - name: https
+      port: 443
+      targetPort: 8080
+      protocol: TCP
+  loadBalancerSourceRanges:
+    - "10.0.0.0/16"
+    - "172.16.0.0/12"
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+
+---
+# ConfigMap with application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-api-config
+  namespace: production
+data:
+  app.yaml: |
+    server:
+      port: 8080
+      host: "0.0.0.0"
+      read_timeout: "30s"
+      write_timeout: "30s"
+
+    database:
+      max_connections: 25
+      connection_timeout: "10s"
+      idle_timeout: "5m"
+
+    redis:
+      max_connections: 10
+      timeout: "5s"
+
+    monitoring:
+      enabled: true
+      metrics_port: 9090
+      health_check_interval: "10s"
+
+    features:
+      rate_limiting: true
+      caching: true
+      circuit_breaker: true
+
+  logging.yaml: |
+    level: "info"
+    format: "json"
+    output: "stdout"
+
+    loggers:
+      http: "debug"
+      database: "info"
+      cache: "warn"
+
+    sampling:
+      initial: 100
+      thereafter: 100

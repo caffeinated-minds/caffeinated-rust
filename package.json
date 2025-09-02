@@ -1,0 +1,31 @@
+{
+  "name": "caffeinated-rust-dark",
+  "displayName": "Caffeinated Rust Dark",
+  "description": "My personal dark theme.",
+  "version": "0.0.2",
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "keywords": [
+    "theme",
+    "dark theme",
+    "caffeinated",
+    "caffeinated minds",
+    "charcoal backgrounds",
+    "rust accents",
+    "warm-tech",
+    "warm aesthetic"
+  ],
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "Caffeinated-Rust",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Caffeinated-Rust-color-theme.json"
+      }
+    ]
+  }
+}
