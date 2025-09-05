@@ -32,13 +32,17 @@ Caffeinated Rust combines the warmth of rust and coral with the clarity of a dar
 
 ## Screenshots
 
+### Yaml Code
+
+![Yaml Screenshot](images/yaml.png)
+
 ### Go Code
 
-![Go Screenshot](images/go-example.png)
+![Go Screenshot](images/go.png)
 
 ### Python
 
-![JavaScript Screenshot](images/js-example.png)
+![Python Screenshot](images/python.png)
 
 ## Language Support
 

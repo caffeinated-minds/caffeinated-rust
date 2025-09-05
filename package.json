@@ -1,8 +1,13 @@
 {
   "name": "caffeinated-rust-dark",
-  "displayName": "Caffeinated Rust Dark",
+  "displayName": "Caffeinated Rust",
   "description": "My personal dark theme.",
   "version": "0.0.2",
+  "publisher": "CaffeinatedMinds",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/caffeinated-minds/caffeinated-rust/"
+  },
   "engines": {
     "vscode": "^1.103.0"
   },
