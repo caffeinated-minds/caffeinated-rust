@@ -2,7 +2,7 @@
   "name": "caffeinated-rust-dark",
   "displayName": "Caffeinated Rust",
   "description": "My personal dark theme.",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "publisher": "CaffeinatedMinds",
   "repository": {
     "type": "git",
