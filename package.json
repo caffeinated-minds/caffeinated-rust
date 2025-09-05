@@ -9,7 +9,7 @@
     "url": "https://github.com/caffeinated-minds/caffeinated-rust/"
   },
   "engines": {
-    "vscode": "^1.96.4"
+    "vscode": "^1.103.0"
   },
   "keywords": [
     "theme",
