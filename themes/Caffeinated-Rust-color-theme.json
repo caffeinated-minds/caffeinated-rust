@@ -432,15 +432,95 @@
       "settings": { "foreground": "#6C6C6C", "fontStyle": "italic" }
     },
     {
+      "scope": ["comment", "comment.line"],
+      "settings": { "foreground": "#6C6C6C", "fontStyle": "italic" }
+    },
+    {
+      "scope": ["comment", "punctuation.definition.string"],
+      "settings": { "foreground": "#F7A072", "fontStyle": "italic" }
+    },
+    {
+      "scope": ["comment", "punctuation.definition.block.sequence.item"],
+      "settings": { "foreground": "#B7410E" }
+    },
+    {
+      "scope": ["comment", "punctuation.separator"],
+      "settings": { "foreground": "#F4BE68" }
+    },
+    {
+      "scope": ["comment", "punctuation.section"],
+      "settings": { "foreground": "#76C7A5" }
+    },
+    {
+      "scope": ["comment", "punctuation.other"],
+      "settings": { "foreground": "#76C7A5" }
+    },
+    {
+      "scope": ["comment", "string.quoted"],
+      "settings": { "fontStyle": "italic" }
+    },
+    {
+      "scope": ["comment", "string.unquoted"],
+      "settings": { "foreground": "#EDEDED" }
+    },
+    {
       "scope": ["keyword", "storage"],
       "settings": { "foreground": "#B7410E" }
+    },
+    {
+      "scope": ["keyword", "keyword.type"],
+      "settings": { "foreground": "#B7410E" }
+    },
+    {
+      "scope": ["keyword", "keyword.struct"],
+      "settings": { "foreground": "#B7410E" }
+    },
+    {
+      "scope": ["keyword", "keyword.function"],
+      "settings": { "foreground": "#B7410E" }
+    },
+    {
+      "scope": ["keyword", "keyword.control.import"],
+      "settings": { "foreground": "#B7410E" }
+    },
+    {
+      "scope": ["keyword", "keyword.control.flow"],
+      "settings": { "foreground": "#76C7A5" }
+    },
+    {
+      "scope": ["keyword", "entity.name.type.class.python"],
+      "settings": { "foreground": "#F4BE68" }
     },
     {
       "scope": ["string", "constant.other.symbol"],
       "settings": { "foreground": "#F7A072" }
     },
     {
-      "scope": ["variable", "entity.name.function"],
+      "scope": ["variable", "entity.name.function.go"],
+      "settings": { "foreground": "#F4BE68" }
+    },
+    {
+      "scope": ["variable", "entity.name.function.python"],
+      "settings": { "foreground": "#F4BE68" }
+    },
+    {
+      "scope": ["variable", "variable.other"],
+      "settings": { "foreground": "#EDEDED" }
+    },
+    {
+      "scope": ["variable", "variable.other.property"],
+      "settings": { "foreground": "#76C7A5" }
+    },
+    {
+      "scope": ["variable", "variable.other.assignment"],
+      "settings": { "foreground": "#F4BE68" }
+    },
+    {
+      "scope": ["variable", "entity.other.document.begin"],
+      "settings": { "foreground": "#B7410E" }
+    },
+    {
+      "scope": ["variable", "entity.name.tag"],
       "settings": { "foreground": "#76C7A5" }
     },
     {
